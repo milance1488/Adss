@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADSS Sistem</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+  :root {
+    --bg:#0f1117;--surface:#1a1d27;--surface2:#222636;--border:#2e3347;
+    --accent:#f5a623;--accent2:#3ecf8e;--danger:#ff5c5c;--text:#e8eaf0;--muted:#7a7f94;
+    --majstor:#f5a623;--penjac:#6b9fff;--zemlja:#c46bff;--svi:#3ecf8e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;min-height:100vh;padding-bottom:60px}
+  .landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:16px}
+  .landing h1{font-family:'IBM Plex Mono',monospace;font-size:18px;color:var(--accent);letter-spacing:2px;text-align:center}
+  .landing p{color:var(--muted);font-size:13px;text-align:center}
+  .role-cards{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px;margin-top:8px}
+  .role-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:14px}
+  .role-card:active{background:var(--surface2)}
+  .role-card .rc-icon{font-size:24px}
+  .role-card .rc-info{flex:1}
+  .role-card .rc-name{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700}
+  .role-card .rc-desc{font-size:12px;color:var(--muted);margin-top:2px}
+  .role-card.majstor{border-color:var(--majstor)}
+  .role-card.penjac{border-color:var(--penjac)}
+  .role-card.zemlja{border-color:var(--zemlja)}
+  .role-card.admin{border-color:var(--accent2)}
+  .role-card .rc-name.majstor{color:var(--majstor)}
+  .role-card .rc-name.penjac{color:var(--penjac)}
+  .role-card .rc-name.zemlja{color:var(--zemlja)}
+  .role-card .rc-name.admin{color:var(--accent2)}
+  header{background:var(--surface);border-bottom:2px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px}
+  .hdr-back{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px}
+  .hdr-info{flex:1}
+  .hdr-title{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;letter-spacing:1px}
+  .hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
+  .hdr-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+  .badge-majstor{background:#2a1f0a;color:var(--majstor)}
+  .badge-penjac{background:#1a1f2e;color:var(--penjac)}
+  .badge-zemlja{background:#2a1a2a;color:var(--zemlja)}
+  .badge-admin{background:#0f2a1e;color:var(--accent2)}
+  .progress-wrap{padding:12px 16px 0}
+  .progress-bar-bg{background:var(--border);border-radius:4px;height:6px;overflow:hidden}
+  .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .4s}
+  .progress-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px;text-align:right}
+  .stub-wrap{padding:12px 16px 0;display:flex;align-items:center;gap:10px}
+  .stub-wrap label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;flex-shrink:0}
+  .stub-ctrl{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px}
+  .stub-ctrl input{background:none;border:none;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;width:50px;text-align:center;outline:none}
+  .btn-nav{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:18px;width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .type-toggle{display:flex;gap:8px;padding:10px 16px 0}
+  .type-btn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .15s;text-transform:uppercase}
+  .type-btn.active-zatezni{background:#2a1f0a;border-color:var(--accent);color:var(--accent)}
+  .type-btn.active-medju{background:#0f2a1e;border-color:var(--accent2);color:var(--accent2)}
+  .sections{padding:10px 16px 0;display:flex;flex-direction:column;gap:10px}
+  .section{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+  .sec-header{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+  .sec-icon{font-size:16px;width:28px;text-align:center}
+  .sec-title{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;flex:1}
+  .sec-count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+  .task-list{list-style:none}
+  .task-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+  .task-item:last-child{border-bottom:none}
+  .task-item.done{background:#1a2e22}
+  .task-item.done .task-text{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--accent2)}
+  .checkbox{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .task-item.done .checkbox{background:var(--accent2);border-color:var(--accent2)}
+  .tick{display:none;color:#0f1117;font-size:13px;font-weight:700}
+  .task-item.done .tick{display:block}
+  .task-text{font-size:13px;line-height:1.4;flex:1}
+  .done-banner{display:none;margin:12px 16px 0;background:#1a2e22;border:1px solid var(--accent2);border-radius:12px;padding:14px;text-align:center}
+  .done-banner.show{display:block}
+  .done-banner p{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)}
+  .done-banner span{font-size:11px;color:var(--muted);display:block;margin-top:3px}
+  .admin-wrap{padding:12px 16px 0;display:flex;flex-direction:column;gap:12px}
+  .admin-section{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+  .admin-sec-hdr{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .admin-sec-hdr h2{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;flex:1}
+  .stub-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+  .stub-row:last-child{border-bottom:none}
+  .stub-num{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;width:52px;flex-shrink:0}
+  .stub-type-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;margin-right:6px}
+  .tbadge-zatezni{background:#2a1f0a;color:var(--accent)}
+  .tbadge-medju{background:#0f2a1e;color:var(--accent2)}
+  .workers-done{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+  .w-chip{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px}
+  .w-chip.full{opacity:1}.w-chip.partial{opacity:0.6}.w-chip.none{opacity:0.25}
+  .chip-majstor{background:#2a1f0a;color:var(--majstor)}
+  .chip-penjac{background:#1a1f2e;color:var(--penjac)}
+  .chip-zemlja{background:#2a1a2a;color:var(--zemlja)}
+  .stub-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);width:36px;text-align:right;flex-shrink:0}
+  .admin-filter{display:flex;gap:6px;padding:10px 14px;flex-wrap:wrap}
+  .filter-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer}
+  .filter-btn.active{border-color:var(--accent2);color:var(--accent2);background:#0f2a1e}
+  .empty-admin{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+  .stat-cards{display:flex;gap:8px;padding:0 16px;margin-top:12px}
+  .stat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+  .stat-num{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--accent2)}
+  .stat-label{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="pageLanding" class="landing">
+  <h1>⚡ ADSS SISTEM</h1>
+  <p>Odaberi svoju ulogu</p>
+  <div class="role-cards">
+    <div class="role-card majstor" onclick="enterRole('majstor')">
+      <span class="rc-icon">👷</span>
+      <div class="rc-info">
+        <div class="rc-name majstor">MAJSTOR</div>
+        <div class="rc-desc">Zadaci za majstora na terenu</div>
+      </div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+    <div class="role-card penjac" onclick="enterRole('penjac')">
+      <span class="rc-icon">🧗</span>
+      <div class="rc-info">
+        <div class="rc-name penjac">PENJAČ</div>
+        <div class="rc-desc">Zadaci za penjača na stubu</div>
+      </div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+    <div class="role-card zemlja" onclick="enterRole('zemlja')">
+      <span class="rc-icon">🦺</span>
+      <div class="rc-info">
+        <div class="rc-name zemlja">ZEMLJA</div>
+        <div class="rc-desc">Zadaci za radnika na zemlji</div>
+      </div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+    <div class="role-card admin" onclick="enterRole('admin')" style="margin-top:8px;border-style:dashed">
+      <span class="rc-icon">📊</span>
+      <div class="rc-info">
+        <div class="rc-name admin">ADMIN</div>
+        <div class="rc-desc">Pregled napretka svih radnika</div>
+      </div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+  </div>
+</div>
+
+<div id="pageWorker" class="hidden">
+  <header>
+    <button class="hdr-back" onclick="goBack()">‹</button>
+    <div class="hdr-info">
+      <div class="hdr-title" id="wHdrTitle">ADSS</div>
+      <div class="hdr-sub" id="wHdrSub">Stub 1</div>
+    </div>
+    <span class="hdr-badge" id="wHdrBadge"></span>
+  </header>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar" id="wProgressBar"></div></div>
+    <div class="progress-label" id="wProgressLabel"></div>
+  </div>
+  <div class="stub-wrap">
+    <label>Stub</label>
+    <button class="btn-nav" onclick="changeStub(-1)">−</button>
+    <div class="stub-ctrl">
+      <input type="number" id="stubInput" value="1" min="1" max="99" onchange="loadStub()">
+    </div>
+    <button class="btn-nav" onclick="changeStub(1)">+</button>
+  </div>
+  <div class="type-toggle">
+    <button class="type-btn active-zatezni" id="btnZ" onclick="setType('zatezni')">⚓ Zatezni</button>
+    <button class="type-btn" id="btnM" onclick="setType('medju')">🔗 Međustub</button>
+  </div>
+  <div id="doneBanner" class="done-banner">
+    <p>✅ SVE ZAVRŠENO!</p>
+    <span>Svi tvoji zadaci na ovom stubu su označeni</span>
+  </div>
+  <div class="sections" id="workerSections"></div>
+</div>
+
+<div id="pageAdmin" class="hidden">
+  <header>
+    <button class="hdr-back" onclick="goBack()">‹</button>
+    <div class="hdr-info">
+      <div class="hdr-title">ADMIN PANEL</div>
+      <div class="hdr-sub">Pregled napretka</div>
+    </div>
+    <span class="hdr-badge badge-admin">ADMIN</span>
+  </header>
+  <div class="stat-cards" id="statCards"></div>
+  <div class="admin-wrap">
+    <div class="admin-section">
+      <div class="admin-sec-hdr"><span>📋</span><h2>Stubovi</h2></div>
+      <div class="admin-filter">
+        <button class="filter-btn active" id="fAll" onclick="setFilter('all')">Svi</button>
+        <button class="filter-btn" id="fDone" onclick="setFilter('done')">Završeni</button>
+        <button class="filter-btn" id="fPart" onclick="setFilter('partial')">U toku</button>
+        <button class="filter-btn" id="fNone" onclick="setFilter('none')">Nije početo</button>
+      </div>
+      <div id="adminStubList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TASKS = {
+  zatezni: [
+    { title:"Priprema", icon:"🔧", tasks:[
+      {text:"Provjeri stanje stuba (pukotine, nagib)", who:["majstor"]},
+      {text:"Pripremi obujmicu odgovarajuće veličine", who:["zemlja"]},
+      {text:"Pripremi konzolu i vijke", who:["zemlja"]},
+      {text:"Pripremi zatezni stezač (dead-end kit)", who:["zemlja"]},
+      {text:"Pripremi nosač rezerve kabla", who:["zemlja"]},
+    ]},
+    { title:"Montaža na stubu", icon:"🧱", tasks:[
+      {text:"Postavi i zategni obujmicu oko stuba", who:["penjac"]},
+      {text:"Montiraj konzolu na obujmicu", who:["penjac"]},
+      {text:"Provjeri da je konzola horizontalna i čvrsta", who:["majstor"]},
+      {text:"Postavi privremeni klizač za provlačenje kabla", who:["penjac"]},
+    ]},
+    { title:"Nakon provlačenja kabla", icon:"⚓", tasks:[
+      {text:"Ukloni privremeni klizač", who:["penjac"]},
+      {text:"Odmotaj preformed dead-end žice iz paketa", who:["zemlja"]},
+      {text:"Označi sredinu stezača, poravnaj sa kablom", who:["majstor"]},
+      {text:"Obmotaj unutrašnji sloj žica spiralno", who:["majstor"]},
+      {text:"Obmotaj spoljašnji sloj žica", who:["majstor"]},
+      {text:"Zakači stezač na konzolu", who:["majstor"]},
+      {text:"Provjeri da nema odizanja žica", who:["majstor"]},
+    ]},
+    { title:"Rezerva kabla", icon:"🔄", tasks:[
+      {text:"Odmjeri 8–10m rezervnog kabla", who:["majstor","penjac","zemlja"]},
+      {text:"Uvij u petlju prečnika ~80cm", who:["majstor","penjac","zemlja"]},
+      {text:"Pričvrsti vezicama za nosač rezerve", who:["penjac"]},
+      {text:"Provjeri minimalni radijus savijanja", who:["majstor"]},
+    ]},
+    { title:"Završna provjera", icon:"✅", tasks:[
+      {text:"Konzola stabilna – nema pomicanja", who:["majstor"]},
+      {text:"Dead-end stezač pravilno montiran", who:["majstor"]},
+      {text:"Rezerva uredno odložena", who:["majstor"]},
+      {text:"Alat i ostaci skupljeni sa stuba", who:["zemlja"]},
+    ]},
+  ],
+  medju: [
+    { title:"Priprema", icon:"🔧", tasks:[
+      {text:"Pripremi obujmicu odgovarajuće veličine", who:["zemlja"]},
+      {text:"Pripremi konzolu i vijke", who:["zemlja"]},
+      {text:"Pripremi klizač (roller) za provlačenje", who:["zemlja"]},
+      {text:"Pripremi viseći stezač (suspension clamp)", who:["zemlja"]},
+    ]},
+    { title:"Montaža na stubu", icon:"🧱", tasks:[
+      {text:"Postavi i zategni obujmicu oko stuba", who:["penjac"]},
+      {text:"Montiraj konzolu na obujmicu", who:["penjac"]},
+      {text:"Provjeri da je konzola horizontalna", who:["penjac"]},
+      {text:"Postavi klizač (roller) za provlačenje kabla", who:["penjac"]},
+    ]},
+    { title:"Nakon provlačenja kabla", icon:"🔗", tasks:[
+      {text:"Ukloni klizač s konzole", who:["penjac"]},
+      {text:"Otvori viseći stezač (dvije polovine)", who:["penjac"]},
+      {text:"Postavi gumeni uložak oko kabla", who:["penjac"]},
+      {text:"Zatvori stezač i zategni vijke", who:["penjac"]},
+      {text:"Provjeri aksijalno pomicanje kabla", who:["majstor"]},
+    ]},
+    { title:"Završna provjera", icon:"✅", tasks:[
+      {text:"Konzola stabilna – nema pomicanja", who:["penjac"]},
+      {text:"Viseći stezač pravilno zatvoren", who:["majstor"]},
+      {text:"Strela kabla vizuelno OK", who:["majstor"]},
+      {text:"Alat i klizač skupljeni sa stuba", who:["zemlja"]},
+    ]},
+  ]
+};
+
+const TOTAL_STUBS = 30;
+const ROLES = ["majstor","penjac","zemlja"];
+const ROLE_ICONS = {majstor:"👷",penjac:"🧗",zemlja:"🦺"};
+let state = {};
+let currentRole = null;
+let currentStub = 1;
+let currentType = 'zatezni';
+let adminFilter = 'all';
+
+function saveState() {
+  try { localStorage.setItem('adss_state', JSON.stringify(state)); } catch(e){}
+}
+function loadState() {
+  try {
+    const r = localStorage.getItem('adss_state');
+    if (r) state = JSON.parse(r);
+  } catch(e){ state = {}; }
+}
+
+function show(id) {
+  ['pageLanding','pageWorker','pageAdmin'].forEach(p =>
+    document.getElementById(p).classList.toggle('hidden', p !== id));
+}
+function goBack() { currentRole = null; show('pageLanding'); }
+
+function enterRole(role) {
+  currentRole = role;
+  if (role === 'admin') { renderAdmin(); show('pageAdmin'); return; }
+  currentStub = 1; currentType = 'zatezni';
+  updateWorkerHeader(); renderWorker(); show('pageWorker');
+}
+
+function updateWorkerHeader() {
+  const names = {majstor:"MAJSTOR",penjac:"PENJAČ",zemlja:"ZEMLJA"};
+  const badges = {majstor:"badge-majstor",penjac:"badge-penjac",zemlja:"badge-zemlja"};
+  document.getElementById('wHdrTitle').textContent = ROLE_ICONS[currentRole]+' '+names[currentRole];
+  document.getElementById('wHdrSub').textContent = 'Stub '+currentStub+' · '+(currentType==='zatezni'?'Zatezni':'Međustub');
+  const b = document.getElementById('wHdrBadge');
+  b.textContent = names[currentRole];
+  b.className = 'hdr-badge '+badges[currentRole];
+}
+
+function getStub(stub) {
+  if (!state[stub]) state[stub] = {type:'zatezni',checks:{}};
+  return state[stub];
+}
+function taskKey(role,si,ti){ return `${role}_s${si}_t${ti}`; }
+
+function changeStub(d) {
+  currentStub = Math.max(1,Math.min(TOTAL_STUBS,currentStub+d));
+  document.getElementById('stubInput').value = currentStub;
+  const s = state[currentStub];
+  if (s){ currentType=s.type; syncTypeButtons(); }
+  updateWorkerHeader(); renderWorker();
+}
+function loadStub() {
+  currentStub = parseInt(document.getElementById('stubInput').value)||1;
+  const s = state[currentStub];
+  if (s){ currentType=s.type; syncTypeButtons(); }
+  updateWorkerHeader(); renderWorker();
+}
+function setType(t) {
+  currentType=t; getStub(currentStub).type=t;
+  syncTypeButtons(); updateWorkerHeader(); renderWorker(); saveState();
+}
+function syncTypeButtons() {
+  document.getElementById('btnZ').className='type-btn'+(currentType==='zatezni'?' active-zatezni':'');
+  document.getElementById('btnM').className='type-btn'+(currentType==='medju'?' active-medju':'');
+}
+
+function toggleTask(si,ti) {
+  const s = getStub(currentStub);
+  const k = taskKey(currentRole,si,ti);
+  s.checks[k] = !s.checks[k];
+  saveState(); renderWorker();
+}
+
+function renderWorker() {
+  const sections = TASKS[currentType];
+  const s = getStub(currentStub);
+  const checks = s.checks;
+  let myTotal=0, myDone=0, html='';
+  sections.forEach((sec,si) => {
+    const myTasks = sec.tasks.map((t,ti)=>({t,ti})).filter(({t})=>t.who.includes(currentRole));
+    if (!myTasks.length) return;
+    let secDone=0, tasksHtml='';
+    myTasks.forEach(({t,ti}) => {
+      const k=taskKey(currentRole,si,ti);
+      const done=!!checks[k];
+      if(done){secDone++;myDone++;}
+      myTotal++;
+      tasksHtml+=`<li class="task-item ${done?'done':''}" onclick="toggleTask(${si},${ti})">
+        <div class="checkbox"><span class="tick">✓</span></div>
+        <span class="task-text">${t.text}</span></li>`;
+    });
+    html+=`<div class="section">
+      <div class="sec-header">
+        <span class="sec-icon">${sec.icon}</span>
+        <span class="sec-title">${sec.title}</span>
+        <span class="sec-count">${secDone}/${myTasks.length}</span>
+      </div>
+      <ul class="task-list">${tasksHtml}</ul></div>`;
+  });
+  document.getElementById('workerSections').innerHTML = html||'<div style="padding:20px;text-align:center;color:var(--muted)">Nema zadataka</div>';
+  const pct = myTotal>0?Math.round(myDone/myTotal*100):0;
+  document.getElementById('wProgressBar').style.width=pct+'%';
+  document.getElementById('wProgressLabel').textContent=`${myDone} / ${myTotal} zadataka (${pct}%)`;
+  document.getElementById('doneBanner').classList.toggle('show', myTotal>0&&myDone===myTotal);
+}
+
+function setFilter(f) {
+  adminFilter=f;
+  ['All','Done','Part','None'].forEach(x=>
+    document.getElementById('f'+x).classList.toggle('active', f===x.toLowerCase()||(f==='all'&&x==='All')));
+  renderAdminList();
+}
+
+function getStubStats(stub) {
+  const s=state[stub];
+  if(!s) return {type:'zatezni',workers:{majstor:{done:0,total:0},penjac:{done:0,total:0},zemlja:{done:0,total:0}},totalDone:0,totalAll:0};
+  const type=s.type||'zatezni';
+  const checks=s.checks||{};
+  const sections=TASKS[type];
+  const w={majstor:{done:0,total:0},penjac:{done:0,total:0},zemlja:{done:0,total:0}};
+  sections.forEach((sec,si)=>sec.tasks.forEach((t,ti)=>t.who.forEach(role=>{
+    if(!w[role])return;
+    w[role].total++;
+    if(checks[taskKey(role,si,ti)])w[role].done++;
+  })));
+  const totalDone=ROLES.reduce((a,r)=>a+w[r].done,0);
+  const totalAll=ROLES.reduce((a,r)=>a+w[r].total,0);
+  return {type,workers:w,totalDone,totalAll};
+}
+
+function renderAdmin() {
+  let touched=0,completed=0,allDone=0,allTasks=0;
+  for(let i=1;i<=TOTAL_STUBS;i++){
+    const st=getStubStats(i);
+    if(st.totalDone>0)touched++;
+    if(st.totalAll>0&&st.totalDone===st.totalAll)completed++;
+    allDone+=st.totalDone; allTasks+=st.totalAll;
+  }
+  const pct=allTasks>0?Math.round(allDone/allTasks*100):0;
+  document.getElementById('statCards').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${completed}</div><div class="stat-label">Završeni</div></div>
+    <div class="stat-card"><div class="stat-num">${touched}</div><div class="stat-label">U toku</div></div>
+    <div class="stat-card"><div class="stat-num">${pct}%</div><div class="stat-label">Ukupno</div></div>`;
+  renderAdminList();
+}
+
+function renderAdminList() {
+  const list=document.getElementById('adminStubList');
+  let html='',count=0;
+  for(let i=1;i<=TOTAL_STUBS;i++){
+    const st=getStubStats(i);
+    const pct=st.totalAll>0?Math.round(st.totalDone/st.totalAll*100):0;
+    const isComplete=st.totalAll>0&&st.totalDone===st.totalAll;
+    const isPartial=st.totalDone>0&&!isComplete;
+    if(adminFilter==='done'&&!isComplete)continue;
+    if(adminFilter==='partial'&&!isPartial)continue;
+    if(adminFilter==='none'&&st.totalDone!==0)continue;
+    count++;
+    const typeLabel=`<span class="stub-type-badge tbadge-${st.type}">${st.type==='zatezni'?'ZAT':'MĐU'}</span>`;
+    const chips=ROLES.map(r=>{
+      const wr=st.workers[r];
+      const cls=wr.total===0?'none':(wr.done===wr.total?'full':(wr.done>0?'partial':'none'));
+      return `<span class="w-chip ${cls} chip-${r}">${ROLE_ICONS[r]} ${wr.done}/${wr.total}</span>`;
+    }).join('');
+    html+=`<div class="stub-row">
+      <span class="stub-num">S-${String(i).padStart(2,'0')}</span>
+      ${typeLabel}<div class="workers-done">${chips}</div>
+      <span class="stub-pct">${pct}%</span></div>`;
+  }
+  if(!count) html='<div class="empty-admin">Nema podataka</div>';
+  list.innerHTML=html;
+}
+
+loadState();
+</script>
+
+</body>
+</html>
